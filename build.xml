@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2017 Red Hat, Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project name="AppCreator" default="deploy" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
+    <description>Package used to setup Salesforce Connected App used for integration with RedHat Fuse middleware.</description>
+
+    <property prefix="config" file="salesforce.properties" />
+    <property environment="env" />
+
+    <property name="username" value="${config.salesforce.username}" if:set="config.salesforce.username" />
+    <property name="username" value="${env.SALESFORCE_USERNAME}" if:set="env.SALESFORCE_USERNAME" />
+
+    <property name="password" value="${config.salesforce.password}" if:set="config.salesforce.password" />
+    <property name="password" value="${env.SALESFORCE_PASSWORD}" if:set="env.SALESFORCE_PASSWORD" />
+
+    <fail unless:set="username" message="To run the deployment you need to specify either `salesforce.username` in: salesforce.properties or SALESFORCE_USERNAME environment variable" />
+
+    <fail unless:set="password" message="To run the migrations you need to specify either `salesforce.password` in: salesforce.properties or set SALESFORCE_PASSWORD environment variable" />
+
+    <taskdef resource="com/salesforce/antlib.xml" uri="antlib:com.salesforce">
+        <classpath>
+            <pathelement location="antlib/ant-salesforce.jar" />
+        </classpath>
+    </taskdef>
+
+    <target name="build">
+        <exec executable="yarn" failonerror="true">
+            <arg value="build" />
+        </exec>
+    </target>
+
+    <target name="deploy" depends="build">
+        <sf:deploy xmlns:sf="antlib:com.salesforce" username="${username}" password="${password}" deployRoot="package" rollbackOnError="true" />
+    </target>
+</project>
