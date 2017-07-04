@@ -16,7 +16,9 @@
     limitations under the License.
 
 -->
-<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Setup page for Fuse Salesforce integration.</description>
-    <label>fuse_setup</label>
-</ApexPage>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>setup</fullName>
+    <description>Salesforce setup JavaScript support</description>
+    <contentType>application/javascript</contentType>
+    <cacheControl>Public</cacheControl>
+</StaticResource>

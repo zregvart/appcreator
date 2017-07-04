@@ -15,19 +15,16 @@
  * limitations under the License.
  */
 
-import Metadata from './metadata.js';
+ const CLIENT_ID = 'JBoss Fuse';
+ const CONNECTED_APP_NAME = 'FuseApp';
+ const CONTACT_EMAIL = 'support@redhat.com';
+ const APP_DESCRIPTION = 'Salesforce Connected App used for integration with RedHat Fuse middleware.';
+ const INFO_URL = 'https://www.redhat.com/en/technologies/jboss-middleware/fuse';
 
-/**
- * Performs the bulk of setting up for Fuse.
- *
- * @param {string} metadataUrl - URL to the SOAP Metadata API port
- * @param {string} sessionId   - Salesforce sessionId used for authentication
- * @return {Promise} resulting Promise
- */
-export function setup(metadataUrl, sessionId) {
-  let metadata = new Metadata(metadataUrl, sessionId);
-
-  return metadata.deleteConnectedApp().then(() => {
-    return metadata.createConnectedApp();
-  });
-};
+ export {
+   CLIENT_ID,
+   CONNECTED_APP_NAME,
+   CONTACT_EMAIL,
+   APP_DESCRIPTION,
+   INFO_URL,
+ };

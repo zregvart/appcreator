@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright (C) 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+public class SetupController {
 
-import Metadata from './metadata.js';
+    public String error {get; set;}
 
-/**
- * Performs the bulk of setting up for Fuse.
- *
- * @param {string} metadataUrl - URL to the SOAP Metadata API port
- * @param {string} sessionId   - Salesforce sessionId used for authentication
- * @return {Promise} resulting Promise
- */
-export function setup(metadataUrl, sessionId) {
-  let metadata = new Metadata(metadataUrl, sessionId);
+    public String getMetadataUrl() {
+        return URL.getSalesforceBaseUrl().toExternalForm() + '/services/Soap/m/38.0';
+    }
 
-  return metadata.deleteConnectedApp().then(() => {
-    return metadata.createConnectedApp();
-  });
-};
+    public void showError() {
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.Error, error));
+    }
+
+}

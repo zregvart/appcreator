@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright (C) 2017 Red Hat, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class FuseSetupController {
 
-    public String getMetadataUrl() {
-        return URL.getSalesforceBaseUrl().toExternalForm() + '/services/Soap/m/38.0';
-    }
-
-}
+/**
+ * Trims the given XML string removing all newlines and all text inbetween
+ * tags.
+ *
+ * @param {string} str - XML string
+ * @return {string} - trimmed XML string
+ */
+export default function trim(str) {
+  return str.replace(/\n/g, '').replace(/\>\s+\</g, '><');
+};

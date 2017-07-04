@@ -15,19 +15,17 @@
  * limitations under the License.
  */
 
-import Metadata from './metadata.js';
+import * as Setup from '../index.js';
 
-/**
- * Performs the bulk of setting up for Fuse.
- *
- * @param {string} metadataUrl - URL to the SOAP Metadata API port
- * @param {string} sessionId   - Salesforce sessionId used for authentication
- * @return {Promise} resulting Promise
- */
-export function setup(metadataUrl, sessionId) {
-  let metadata = new Metadata(metadataUrl, sessionId);
+jest.mock('../metadata');
 
-  return metadata.deleteConnectedApp().then(() => {
-    return metadata.createConnectedApp();
+describe('Setup', () => {
+  it('Should setup connected app', () => {
+    return Setup.setup('https://metadata.url', 'sessionId').then((data) => {
+      expect(data).toMatchObject({
+        consumerKey: '_consumerKey_',
+        consumerSecret: '_consumerSecret_',
+      });
+    });
   });
-};
+});

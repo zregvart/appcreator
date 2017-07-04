@@ -1,0 +1,63 @@
+<!--
+
+    Copyright (C) 2017 Red Hat, Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<apex:page controller="SetupController">
+
+  <apex:includeScript value="{!$Resource.setup}"/>
+
+
+  <apex:form id="frmStandaloneSetup">
+    <apex:actionFunction name="showError" action="{!showError}" rerender="messages">
+      <apex:param name="error" assignTo="{!error}" value=""/>
+    </apex:actionFunction>
+
+    <apex:pageBlock title="{!$Label.standalone_setup_title}" id="blkStandaloneSetup">
+      <apex:pageMessages id="messages"/>
+      <p>{!$Label.standalone_setup_text}</p>
+      <p>
+        <apex:outputLabel value="{!$Label.standalone_configuration}" for="txtConfiguration"/>
+      </p>
+      <p>
+        <apex:inputTextarea id="txtConfiguration" readonly="true" rows="5" cols="160"/>
+      </p>
+      <apex:pageBlockButtons id="blkButtons">
+        <apex:CommandButton value="{!$Label.standalone_setup_button}" id="btnStandaloneSetup"/>
+      </apex:pageBlockButtons>
+    </apex:pageBlock>
+  </apex:form>
+
+  <script>
+    (function(){
+      const configuration = document.getElementById('{!$Component.frmStandaloneSetup.blkStandaloneSetup.txtConfiguration}');
+      const setupButtons = document.querySelectorAll('*[id="{!$Component.frmStandaloneSetup.blkStandaloneSetup.blkButtons.btnStandaloneSetup}"]');
+      const metadataUrl = '{!metadataUrl}';
+      const sessionId = '{!$Api.Session_ID}';
+
+      setupButtons.forEach((el) => el.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        Setup.setup(metadataUrl, sessionId).then((data) => {
+          configuration.value = `camel.component.salesforce.clientId = ${data.consumerKey}
+camel.component.salesforce.clientSecret = ${data.consumerSecret}
+camel.component.salesforce.userName = // place username
+camel.component.salesforce.password = // place password
+`
+        }).catch((e) => showError(`{!$Label.standalone_setup_error} ${e.message}`));
+      }));
+    })();
+  </script>
+</apex:page>

@@ -17,8 +17,8 @@
 
 -->
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
-    <apiAccessLevel>Restricted</apiAccessLevel>
-    <fullName>FuseAppCreator</fullName>
+    <apiAccessLevel>Unrestricted</apiAccessLevel>
+    <fullName>RedHatFuse</fullName>
     <description>Package used to setup Salesforce Connected App used for integration with RedHat Fuse middleware.</description>
     <version>38.0</version>
     <types>
@@ -32,5 +32,9 @@
     <types>
         <members>*</members>
         <name>StaticResource</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomLabel</name>
     </types>
 </Package>

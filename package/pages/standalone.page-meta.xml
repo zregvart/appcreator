@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Copyright (C) 2017 Red Hat, Inc.
@@ -15,10 +16,7 @@
     limitations under the License.
 
 -->
-<apex:page controller="FuseSetupController">
-    <h1>Congratulations</h1>
-
-    <script>
-
-    </script>
-</apex:page>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Setup page for Standalone Salesforce integration.</description>
+    <label>standalone</label>
+</ApexPage>

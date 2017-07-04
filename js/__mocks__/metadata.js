@@ -15,19 +15,26 @@
  * limitations under the License.
  */
 
-import Metadata from './metadata.js';
+/** Mock for Metadata class */
+export default class Metadata {
+  /**
+   * Mock implementation of deleteConnectedApp
+   *
+   * @return {Promise} a resolved empty promise
+   */
+  deleteConnectedApp() {
+    return Promise.resolve();
+  }
 
-/**
- * Performs the bulk of setting up for Fuse.
- *
- * @param {string} metadataUrl - URL to the SOAP Metadata API port
- * @param {string} sessionId   - Salesforce sessionId used for authentication
- * @return {Promise} resulting Promise
- */
-export function setup(metadataUrl, sessionId) {
-  let metadata = new Metadata(metadataUrl, sessionId);
-
-  return metadata.deleteConnectedApp().then(() => {
-    return metadata.createConnectedApp();
-  });
+  /**
+   * Mock implementation of createConnectedApp
+   *
+   * @return {Promise} a resolved predefined promise
+   */
+  createConnectedApp() {
+    return Promise.resolve({
+      consumerKey: '_consumerKey_',
+      consumerSecret: '_consumerSecret_',
+    });
+  }
 };
