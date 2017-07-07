@@ -18,16 +18,33 @@
 import Metadata from './metadata.js';
 
 /**
- * Performs the bulk of setting up for Fuse.
- *
- * @param {string} metadataUrl - URL to the SOAP Metadata API port
- * @param {string} sessionId   - Salesforce sessionId used for authentication
- * @return {Promise} resulting Promise
+ * Performs setting up connected app.
  */
-export function setup(metadataUrl, sessionId) {
-  let metadata = new Metadata(metadataUrl, sessionId);
+export default class Setup {
+  /**
+   * Constructs new Metadata object.
+   *
+   * @param {string} metadataUrl - URL to the SOAP Metadata endpoint
+   * @param {string} sessionId   - sessionId used for authentication
+   */
+  constructor(metadataUrl, sessionId) {
+    this._metadata = new Metadata(metadataUrl, sessionId);
+  }
 
-  return metadata.deleteConnectedApp().then(() => {
-    return metadata.createConnectedApp();
-  });
-};
+  /**
+   * Setup of the connected app.
+   *
+   * @return {Promise} - the resulting Promise of connected app creation
+   */
+  setup() {
+    return this._metadata.createConnectedApp();
+  };
+
+  /**
+   * Determines if the setup has been performed.
+   * @return {Promise}  - Promise that resolves to true if setup has been performed
+   */
+  isSetup() {
+    return this._metadata.connectedAppExists();
+  }
+}

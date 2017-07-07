@@ -144,8 +144,26 @@ export default class Metadata {
           throw error;
         }
 
-        return new Promise((resolve, reject) => resolve(text));
+        return Promise.resolve(text);
       });
+    });
+  }
+
+  /**
+   * Determines if the connected app exists.
+   *
+   * @return {boolean} - true if the connected app exists.
+   */
+  connectedAppExists() {
+    return this._invokeMetadataOperation('listMetadata',
+    `<listMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+      <queries>
+        <type>ConnectedApp</type>
+      </queries>
+      <asOfVersion>39.0</asOfVersion>
+    </listMetadata>`).then((response) => {
+      const apps = this._nodeValues(response, 'fullName');
+      return Promise.resolve(apps && apps.indexOf(Branding.CONNECTED_APP_NAME) >= 0);
     });
   }
 
@@ -160,61 +178,28 @@ export default class Metadata {
     const consumerKey = options['consumerKey'] || this._generateConsumerKey();
     const consumerSecret = options['consumerSecret'] || this._generateConsumerSecret();
 
-    const that = this;
-    const createApp = function() {
-      return that._invokeMetadataOperation('createMetadata',
-      `<createMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
-        <metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ConnectedApp">
-          <fullName>${Branding.CONNECTED_APP_NAME}</fullName>
-          <contactEmail>${Branding.CONTACT_EMAIL}</contactEmail>
-          <description>${Branding.APP_DESCRIPTION}</description>
-          <infoUrl>${Branding.INFO_URL}</infoUrl>
-          <label>${Branding.CONNECTED_APP_NAME}</label>
-          <oauthConfig>
-            <callbackUrl>https://login.salesforce.com/services/oauth2/success</callbackUrl>
-            <consumerKey>${consumerKey}</consumerKey>
-            <consumerSecret>${consumerSecret}</consumerSecret>
-            <scopes>Api</scopes>
-            <scopes>RefreshToken</scopes>
-            <scopes>OfflineAccess</scopes>
-          </oauthConfig>
-        </metadata>
-      </createMetadata>`).then((response) => {
-        return new Promise((resolve, reject) => resolve({
-          consumerKey: consumerKey,
-          consumerSecret: consumerSecret,
-        }));
+    return this._invokeMetadataOperation('createMetadata',
+    `<createMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
+      <metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ConnectedApp">
+        <fullName>${Branding.CONNECTED_APP_NAME}</fullName>
+        <contactEmail>${Branding.CONTACT_EMAIL}</contactEmail>
+        <description>${Branding.APP_DESCRIPTION}</description>
+        <infoUrl>${Branding.INFO_URL}</infoUrl>
+        <label>${Branding.CONNECTED_APP_NAME}</label>
+        <oauthConfig>
+          <callbackUrl>https://login.salesforce.com/services/oauth2/success</callbackUrl>
+          <consumerKey>${consumerKey}</consumerKey>
+          <consumerSecret>${consumerSecret}</consumerSecret>
+          <scopes>Api</scopes>
+          <scopes>RefreshToken</scopes>
+          <scopes>OfflineAccess</scopes>
+        </oauthConfig>
+      </metadata>
+    </createMetadata>`).then((response) => {
+      return Promise.resolve({
+        consumerKey: consumerKey,
+        consumerSecret: consumerSecret,
       });
-    };
-
-    return this._invokeMetadataOperation('listMetadata',
-    `<listMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
-      <queries>
-        <type>ConnectedApp</type>
-      </queries>
-      <asOfVersion>39.0</asOfVersion>
-    </listMetadata>`).then((response) => {
-      const connectedApps = this._nodeValues(response, 'fullName');
-      if (connectedApps && connectedApps.indexOf(Branding.CONNECTED_APP_NAME) >= 0) {
-        return that.deleteConnectedApp().then(createApp);
-      }
-
-      return createApp();
-    });
-  }
-
-  /**
-   * Deletes Salesforce Connected app using the SOAP Metadata API.
-   *
-   * @return {Promise} resulting Promise
-   */
-  deleteConnectedApp() {
-    return this._invokeMetadataOperation('deleteMetadata',
-    `<deleteMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
-      <type>ConnectedApp</type>
-      <fullNames>${Branding.CONNECTED_APP_NAME}</fullNames>
-    </deleteMetadata>`).then((response) => {
-      return Promise.resolve();
     });
   }
 }

@@ -15,17 +15,43 @@
  * limitations under the License.
  */
 
-import * as Setup from '../index.js';
+import Setup from '../index.js';
 
 jest.mock('../metadata');
 
+import Metadata from '../metadata.js';
+
+const metadata = new Metadata();
+
+const setup = new Setup('https://metadata.url', 'sessionId');
+setup._metadata = metadata;
+
+metadata.createConnectedApp.mockImplementation(() => Promise.resolve({
+  consumerKey: '_consumerKey_',
+  consumerSecret: '_consumerSecret_',
+}));
+
 describe('Setup', () => {
   it('Should setup connected app', () => {
-    return Setup.setup('https://metadata.url', 'sessionId').then((data) => {
+    metadata.connectedAppExists.mockImplementation(() => Promise.resolve(false));
+
+    return setup.setup().then((data) => {
+      expect(metadata.createConnectedApp).toBeCalled();
+
       expect(data).toMatchObject({
         consumerKey: '_consumerKey_',
         consumerSecret: '_consumerSecret_',
       });
+    });
+  });
+
+  it('Should determine if connected app has been created', () => {
+    metadata.connectedAppExists.mockImplementation(() => Promise.resolve(true));
+
+    return setup.isSetup().then((isSetup) => {
+      expect(metadata.connectedAppExists).toBeCalled();
+
+      expect(isSetup).toEqual(true);
     });
   });
 });

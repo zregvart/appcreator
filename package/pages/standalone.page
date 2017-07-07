@@ -50,7 +50,8 @@
       setupButtons.forEach((el) => el.addEventListener('click', (event) => {
         event.preventDefault();
 
-        Setup.setup(metadataUrl, sessionId).then((data) => {
+        const setup = new app['default'](metadataUrl, sessionId);
+        setup.setup().then((data) => {
           configuration.value = `camel.component.salesforce.clientId = ${data.consumerKey}
 camel.component.salesforce.clientSecret = ${data.consumerSecret}
 camel.component.salesforce.userName = // place username

@@ -21,7 +21,7 @@ module.exports = {
   entry: './js/index.js',
   output: {
     filename: './package/staticresources/setup.resource',
-    library: 'Setup',
+    library: 'app',
   },
   plugins: [
     new Uglify({

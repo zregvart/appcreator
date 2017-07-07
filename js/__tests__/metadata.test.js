@@ -87,18 +87,7 @@ describe('Salesforce metadata', () => {
     expect(metadata._generateConsumerSecret()).toMatch(/[0-9]{10,}/);
   });
 
-  it('Should create Salesforce Connected App when app has not been created yet', () => {
-    fetch.mockResponseOnce(`<?xml version="1.0" encoding="UTF-8"?>
-      <listMetadataResponse>
-        <result>
-          <fullName>app1</fullName>
-        </result>
-        <result>
-          <fullName>app2</fullName>
-        </result>
-      </listMetadataResponse>`, {
-      status: 200,
-    });
+  it('Should create Salesforce Connected App', () => {
     fetch.mockResponseOnce(DEFAULT_RESPONSE, {
       status: 201,
     });
@@ -112,17 +101,7 @@ describe('Salesforce metadata', () => {
         consumerSecret: '_consumerSecret_',
       });
 
-      expect(fetch).toBeSoapInvocation([{
-        endpoint: METADATA_URL,
-        action: 'listMetadata',
-        body:
-        `<listMetadata xmlns=\"http://soap.sforce.com/2006/04/metadata\">
-          <queries>
-            <type>ConnectedApp</type>
-          </queries>
-          <asOfVersion>39.0</asOfVersion>
-        </listMetadata>`,
-      }, {
+      expect(fetch).toBeSoapInvocation({
         endpoint: METADATA_URL,
         action: 'createMetadata',
         body:
@@ -142,80 +121,7 @@ describe('Salesforce metadata', () => {
             <scopes>OfflineAccess</scopes>
             </oauthConfig></metadata>
           </createMetadata>`,
-      }]);
-    });
-  });
-
-  it('Should create Salesforce Connected App when app already exists', () => {
-    fetch.mockResponseOnce(`<?xml version="1.0" encoding="UTF-8"?>
-      <listMetadataResponse>
-        <result>
-          <fullName>FuseApp</fullName>
-        </result>
-      </listMetadataResponse>`, {
-      status: 200,
-    });
-    fetch.mockResponseOnce(`<?xml version="1.0" encoding="UTF-8"?>
-      <deleteMetadataResponse>
-        <result>
-          <fullName>FuseApp</fullName>
-          <success>true</success>
-        </result>
-      </deleteMetadataResponse>`, {
-      status: 200,
-    });
-    fetch.mockResponseOnce(DEFAULT_RESPONSE, {
-      status: 201,
-    });
-
-    return metadata.createConnectedApp({
-      consumerKey: '_consumerKey_',
-      consumerSecret: '_consumerSecret_',
-    }).then((data) => {
-      expect(data).toMatchObject({
-        consumerKey: '_consumerKey_',
-        consumerSecret: '_consumerSecret_',
       });
-
-      expect(fetch).toBeSoapInvocation([{
-        endpoint: METADATA_URL,
-        action: 'listMetadata',
-        body:
-        `<listMetadata xmlns=\"http://soap.sforce.com/2006/04/metadata\">
-          <queries>
-            <type>ConnectedApp</type>
-          </queries>
-          <asOfVersion>39.0</asOfVersion>
-        </listMetadata>`,
-      }, {
-        endpoint: METADATA_URL,
-        action: 'deleteMetadata',
-        body:
-        `<deleteMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
-          <type>ConnectedApp</type>
-          <fullNames>FuseApp</fullNames>
-        </deleteMetadata>`,
-      }, {
-        endpoint: METADATA_URL,
-        action: 'createMetadata',
-        body:
-        `<createMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
-          <metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ConnectedApp">
-          <fullName>FuseApp</fullName>
-          <contactEmail>support@redhat.com</contactEmail>
-          <description>Salesforce Connected App used for integration with RedHat Fuse middleware.</description>
-          <infoUrl>https://www.redhat.com/en/technologies/jboss-middleware/fuse</infoUrl>
-          <label>FuseApp</label>
-          <oauthConfig>
-            <callbackUrl>https://login.salesforce.com/services/oauth2/success</callbackUrl>
-            <consumerKey>_consumerKey_</consumerKey>
-            <consumerSecret>_consumerSecret_</consumerSecret>
-            <scopes>Api</scopes>
-            <scopes>RefreshToken</scopes>
-            <scopes>OfflineAccess</scopes>
-            </oauthConfig></metadata>
-          </createMetadata>`,
-      }]);
     });
   });
 
@@ -230,24 +136,6 @@ describe('Salesforce metadata', () => {
     return metadata.createConnectedApp().catch((e) =>
       expect(e).toEqual(new Error('Unable to create Connected App: 500: Difficult lemon'))
     );
-  });
-
-  it('Should support deleting connected apps', () => {
-    fetch.mockResponseOnce(DEFAULT_RESPONSE, {
-      status: 204,
-    });
-
-    return metadata.deleteConnectedApp().then(() => {
-      expect(fetch).toBeSoapInvocation({
-        endpoint: METADATA_URL,
-        action: 'deleteMetadata',
-        body:
-        `<deleteMetadata xmlns="http://soap.sforce.com/2006/04/metadata">
-            <type>ConnectedApp</type>
-            <fullNames>FuseApp</fullNames>
-          </deleteMetadata>`,
-      });
-    });
   });
 
   it('Should invoke metadata service via SOAP', () => {
